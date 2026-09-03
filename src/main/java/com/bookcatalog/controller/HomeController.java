@@ -77,7 +77,7 @@ public class HomeController {
                         @RequestParam(defaultValue = "12") int size,
                         Model model) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<BookDTO> books = bookService.convertToDTO(bookService.searchByTitle(query, pageable));
+        Page<BookDTO> books = bookService.convertToDTO(bookService.searchByTitleOrAuthor(query, pageable));
         WeatherDTO weather = weatherService.getWeatherByCity("New York");
         
         model.addAttribute("books", books);
