@@ -53,6 +53,14 @@ public class BookService {
         return bookRepository.findByAuthorContainingIgnoreCase(author, pageable);
     }
     
+    public Page<Book> searchByTitleOrAuthor(String query, Pageable pageable) {
+        String normalizedQuery = query == null ? "" : query.trim();
+        if (normalizedQuery.isEmpty()) {
+            return getAllBooks(pageable);
+        }
+        return bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(normalizedQuery, normalizedQuery, pageable);
+    }
+    
     public Book createBook(Book book) {
         return bookRepository.save(book);
     }
