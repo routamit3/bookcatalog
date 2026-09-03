@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+        
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-book"></i> BookCatalog
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <h1 class="mb-4"><i class="fas fa-credit-card"></i> Checkout</h1>
+
+        <div class="row">
+            <!-- Order Review -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-receipt"></i> Order Review</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Book Title</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${cartItems}">
+                                    <td th:text="${item.bookTitle}"></td>
+                                    <td th:text="'$' + ${item.bookPrice}"></td>
+                                    <td th:text="${item.quantity}"></td>
+                                    <td th:text="'$' + ${item.totalPrice}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Shipping Information -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> Shipping Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Name:</strong> <span th:text="${user.fullName}"></span></p>
+                        <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            Shipping address and payment details will be configured in a production environment.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-md-4">
+                <div class="card sticky-top" style="top: 20px;">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-calculator"></i> Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <strong th:text="'$' + ${totalPrice}"></strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax (10%):</span>
+                                <strong th:text="'$' + ${#numbers.formatDecimal(totalPrice * 0.1, 1, 2)}"></strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <strong>$0.00</strong>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fs-5">
+                                <span><strong>Total:</strong></span>
+                                <strong th:text="'$' + ${#numbers.formatDecimal(totalPrice * 1.1, 1, 2)}"></strong>
+                            </div>
+                        </div>
+
+                        <form th:action="@{/cart/checkout}" method="post" class="mb-2">
+                            <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                <i class="fas fa-check"></i> Complete Order
+                            </button>
+                        </form>
+
+                        <a href="/cart" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-left"></i> Back to Cart
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Weather -->
+                <div th:if="${weather}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 5px; margin-top: 2rem;">
+                    <h5><i class="fas fa-cloud"></i> Weather</h5>
+                    <p class="mb-1"><strong th:text="${weather.temperature} + '°C'"></strong></p>
+                    <small th:text="${weather.city}"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-white">
+        <div class="container">
+            <p>&copy; 2024 BookCatalog. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
