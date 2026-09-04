@@ -35,6 +35,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
       - name: Download application
         uses: actions/download-artifact@v4
         with:
