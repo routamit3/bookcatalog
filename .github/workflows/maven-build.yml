@@ -39,3 +39,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: application
+
+      - name: Deploy application
+        run: |
+          echo "Starting application..."
+          java -jar *.jar
