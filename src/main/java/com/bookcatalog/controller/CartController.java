@@ -77,7 +77,7 @@ public class CartController {
             }
             
             cartService.addToCart(user, bookId, quantity);
-            redirectAttributes.addFlashAttribute("success", "Book added to cart successfully!");
+            redirectAttributes.addFlashAttribute("success", "Book added to the cart successfully!");
             
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
