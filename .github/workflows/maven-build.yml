@@ -48,6 +48,4 @@ jobs:
       - name: Show downloaded JAR
         run: ls -lh application
 
-      # Azure VM deployment will be added here
-      # after SSH is configured on the Windows Server 2025 VM.
-```
+      
