@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today's Weather | BookCatalog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f4f7fb; }
+        .weather-hero { background: linear-gradient(135deg, #0f4c81, #36a9e1); color: white; }
+        .weather-card { border: 0; box-shadow: 0 8px 24px rgba(15, 76, 129, 0.15); }
+        .advice-card { border-left: 4px solid #36a9e1; }
+        .technical-details { font-size: .9rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: #2c3e50;">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-book"></i> BookCatalog</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/books">Browse Books</a>
+                <a class="nav-link active" href="/weather">Weather</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <div class="weather-hero rounded-3 p-4 p-md-5 mb-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div>
+                    <p class="text-uppercase small mb-2">Today's forecast</p>
+                    <h1 class="display-5 mb-2"><i class="fas fa-cloud-sun"></i> Weather for visitors</h1>
+                    <p class="mb-0">Check the conditions before you head out to browse.</p>
+                </div>
+                <i class="fas fa-umbrella-beach fa-4x opacity-50"></i>
+            </div>
+        </div>
+
+        <form action="/weather" method="get" class="row g-2 mb-4">
+            <div class="col-sm-8 col-md-6">
+                <label for="city" class="form-label">Location</label>
+                <input id="city" name="city" class="form-control" th:value="${weather.city}" placeholder="Enter a city">
+            </div>
+            <div class="col-sm-4 col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Check</button>
+            </div>
+        </form>
+
+        <div class="card weather-card mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <p class="text-muted mb-1">Current conditions</p>
+                        <h2 class="mb-1" th:text="${weather.city}">New York</h2>
+                        <p class="text-muted mb-0" th:text="${weather.description}">Clear</p>
+                    </div>
+                    <div class="text-end">
+                        <div class="display-4 fw-bold" th:text="${#numbers.formatDecimal(weather.temperature, 1, 1)} + '°C'">20.0°C</div>
+                        <small class="text-muted">Today's reading</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6 col-md-3"><strong th:text="${weather.humidity} + '%'">0%</strong><br><small class="text-muted">Humidity</small></div>
+                    <div class="col-6 col-md-3"><strong th:text="${weather.windSpeed} + ' m/s'">0 m/s</strong><br><small class="text-muted">Wind</small></div>
+                    <div class="col-6 col-md-3"><strong th:text="${weather.coatAdvice}">Bring a layer.</strong><br><small class="text-muted">Coat</small></div>
+                    <div class="col-6 col-md-3"><strong th:text="${weather.umbrellaAdvice}">Check the sky.</strong><br><small class="text-muted">Umbrella</small></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6"><div class="card advice-card h-100"><div class="card-body"><h3 class="h5"><i class="fas fa-shirt"></i> What to wear</h3><p class="mb-0" th:text="${weather.coatAdvice}">Bring a coat or warm layer.</p></div></div></div>
+            <div class="col-md-6"><div class="card advice-card h-100"><div class="card-body"><h3 class="h5"><i class="fas fa-umbrella"></i> Rain check</h3><p class="mb-0" th:text="${weather.umbrellaAdvice}">An umbrella is probably not needed today.</p></div></div></div>
+        </div>
+
+        <div class="technical-details text-muted">
+            <p class="mb-1"><i class="fas fa-location-dot"></i> Visitor IP: <span th:text="${clientIp}">Unavailable</span></p>
+            <p class="mb-1"><i class="fas fa-server"></i> Weather server IP: <span th:text="${weatherServerIp}">Unavailable</span></p>
+            <p class="mb-0"><i class="fas fa-network-wired"></i> Application server IP: <span th:text="${applicationServerIp}">Unavailable</span></p>
+        </div>
+    </main>
+</body>
+</html>

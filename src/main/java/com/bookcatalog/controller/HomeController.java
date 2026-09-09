@@ -1,89 +1,67 @@
 package com.bookcatalog.controller;
 
-import com.bookcatalog.dto.BookDTO;
 import com.bookcatalog.dto.WeatherDTO;
 import com.bookcatalog.service.BookService;
 import com.bookcatalog.service.WeatherService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
-    
+
+    private static final String[] CATEGORIES = {
+        "Fiction", "Non-Fiction", "Science", "History", "Biography"
+    };
+
     private final BookService bookService;
     private final WeatherService weatherService;
-    
-    @GetMapping("/")
+
+    @GetMapping({"/", "/home"})
     public String home(Model model) {
-        Page<BookDTO> books = bookService.convertToDTO(bookService.getAllBooks(PageRequest.of(0, 6)));
-        WeatherDTO weather = weatherService.getWeatherByCity("New York");
-        
-        model.addAttribute("books", books.getContent());
-        model.addAttribute("weather", weather);
+        model.addAttribute("books", bookService.convertToDTO(bookService.getAllBooks(PageRequest.of(0, 3))).getContent());
+        model.addAttribute("weather", weatherService.getWeatherByCity("New York"));
         return "index";
     }
-    
-    @GetMapping("/home")
-    public String homePage(Model model) {
-        return home(model);
-    }
-    
+
     @GetMapping("/books")
-    public String browseBooks(@RequestParam(defaultValue = "0") int page,
-                             @RequestParam(defaultValue = "12") int size,
-                             @RequestParam(required = false) String category,
-                             Model model) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<BookDTO> books;
-        
-        if (category != null && !category.isEmpty()) {
-            books = bookService.convertToDTO(bookService.getBooksByCategory(category, pageable));
-            model.addAttribute("selectedCategory", category);
-        } else {
-            books = bookService.convertToDTO(bookService.getAllBooks(pageable));
-        }
-        
-        WeatherDTO weather = weatherService.getWeatherByCity("New York");
-        
-        model.addAttribute("books", books);
-        model.addAttribute("weather", weather);
-        model.addAttribute("categories", new String[]{"Fiction", "Non-Fiction", "Science", "History", "Biography"});
-        
+    public String books(
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
+        var books = category == null || category.isBlank()
+            ? bookService.getAllBooks(PageRequest.of(Math.max(page, 0), 6))
+            : bookService.getBooksByCategory(category, PageRequest.of(Math.max(page, 0), 6));
+
+        model.addAttribute("books", bookService.convertToDTO(books));
+        model.addAttribute("categories", CATEGORIES);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("weather", weatherService.getWeatherByCity("New York"));
         return "books";
     }
-    
+
+    @GetMapping("/search")
+    public String search(@RequestParam String query, Model model) {
+        var books = bookService.convertToDTO(
+            bookService.searchByTitleOrAuthor(query, PageRequest.of(0, 6)));
+        model.addAttribute("books", books);
+        model.addAttribute("categories", CATEGORIES);
+        model.addAttribute("selectedCategory", null);
+        model.addAttribute("weather", weatherService.getWeatherByCity("New York"));
+        return "books";
+    }
+
     @GetMapping("/book-detail")
     public String bookDetail(@RequestParam Long id, Model model) {
-        var book = bookService.getBookById(id);
-        if (book.isPresent()) {
-            model.addAttribute("book", bookService.convertToDTO(book.get()));
-            WeatherDTO weather = weatherService.getWeatherByCity("New York");
-            model.addAttribute("weather", weather);
-            return "book-detail";
-        }
-        return "redirect:/books";
-    }
-    
-    @GetMapping("/search")
-    public String search(@RequestParam String query,
-                        @RequestParam(defaultValue = "0") int page,
-                        @RequestParam(defaultValue = "12") int size,
-                        Model model) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<BookDTO> books = bookService.convertToDTO(bookService.searchByTitleOrAuthor(query, pageable));
-        WeatherDTO weather = weatherService.getWeatherByCity("New York");
-        
-        model.addAttribute("books", books);
-        model.addAttribute("weather", weather);
-        model.addAttribute("searchQuery", query);
-        
-        return "books";
+        bookService.getBookById(id).ifPresent(book ->
+            model.addAttribute("book", bookService.convertToDTO(book)));
+        model.addAttribute("weather", weatherService.getWeatherByCity("New York"));
+        return "book-detail";
     }
 }
