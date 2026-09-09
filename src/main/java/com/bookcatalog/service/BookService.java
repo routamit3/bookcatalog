@@ -18,53 +18,54 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class BookService {
-    
+
     private final BookRepository bookRepository;
-    
+
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }
-    
+
     public Page<Book> getAllBooks(Pageable pageable) {
         return bookRepository.findAll(pageable);
     }
-    
+
     public Optional<Book> getBookById(Long id) {
         return bookRepository.findById(id);
     }
-    
+
     public Optional<Book> getBookByIsbn(String isbn) {
         return bookRepository.findByIsbn(isbn);
     }
-    
+
     public List<Book> getBooksByCategory(String category) {
         return bookRepository.findByCategory(category);
     }
-    
+
     public Page<Book> getBooksByCategory(String category, Pageable pageable) {
         return bookRepository.findByCategory(category, pageable);
     }
-    
+
     public Page<Book> searchByTitle(String title, Pageable pageable) {
         return bookRepository.findByTitleContainingIgnoreCase(title, pageable);
     }
-    
+
     public Page<Book> searchByAuthor(String author, Pageable pageable) {
         return bookRepository.findByAuthorContainingIgnoreCase(author, pageable);
     }
-    
+
     public Page<Book> searchByTitleOrAuthor(String query, Pageable pageable) {
         String normalizedQuery = query == null ? "" : query.trim();
         if (normalizedQuery.isEmpty()) {
             return getAllBooks(pageable);
         }
-        return bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(normalizedQuery, normalizedQuery, pageable);
+        return bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(
+            normalizedQuery, normalizedQuery, pageable);
     }
-    
+
     public Book createBook(Book book) {
         return bookRepository.save(book);
     }
-    
+
     public Book updateBook(Long id, Book bookDetails) {
         Optional<Book> optionalBook = bookRepository.findById(id);
         if (optionalBook.isPresent()) {
@@ -80,11 +81,11 @@ public class BookService {
         }
         return null;
     }
-    
+
     public void deleteBook(Long id) {
         bookRepository.deleteById(id);
     }
-    
+
     public void updateInventory(Long bookId, Integer quantityToDeduct) {
         Optional<Book> optionalBook = bookRepository.findById(bookId);
         if (optionalBook.isPresent()) {
@@ -97,7 +98,7 @@ public class BookService {
             bookRepository.save(book);
         }
     }
-    
+
     public void restoreInventory(Long bookId, Integer quantityToRestore) {
         Optional<Book> optionalBook = bookRepository.findById(bookId);
         if (optionalBook.isPresent()) {
@@ -106,7 +107,7 @@ public class BookService {
             bookRepository.save(book);
         }
     }
-    
+
     public BookDTO convertToDTO(Book book) {
         BookDTO dto = new BookDTO();
         dto.setId(book.getId());
@@ -120,11 +121,11 @@ public class BookService {
         dto.setOutOfStock(book.isOutOfStock());
         return dto;
     }
-    
+
     public List<BookDTO> convertToDTO(List<Book> books) {
         return books.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
-    
+
     public Page<BookDTO> convertToDTO(Page<Book> page) {
         return new PageImpl<>(convertToDTO(page.getContent()), page.getPageable(), page.getTotalElements());
     }

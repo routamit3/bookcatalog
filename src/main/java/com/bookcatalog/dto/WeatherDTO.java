@@ -16,4 +16,6 @@ public class WeatherDTO {
     private int humidity;
     private double windSpeed;
     private String icon;
+    private String coatAdvice;
+    private String umbrellaAdvice;
 }
