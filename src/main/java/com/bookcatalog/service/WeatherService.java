@@ -24,6 +24,9 @@ public class WeatherService {
     @Value("${weather.api.url:https://api.openweathermap.org/data/2.5/weather}")
     private String apiUrl;
 
+    @Value("${weather.geolocation.url:https://ipapi.co}")
+    private String geolocationUrl;
+
     public String getWeatherServerIp() {
         try {
             return InetAddress.getByName(URI.create(apiUrl).getHost()).getHostAddress();
@@ -61,6 +64,19 @@ public class WeatherService {
             defaultWeather.setIcon("02d");
             addOutfitAdvice(defaultWeather);
             return defaultWeather;
+        }
+    }
+
+    public WeatherDTO getWeatherByIp(String ipAddress) {
+        try {
+            String url = String.format("%s/%s/json/", geolocationUrl, ipAddress);
+            String response = restTemplate.getForObject(url, String.class);
+            JsonNode location = objectMapper.readTree(response);
+            double latitude = location.get("latitude").asDouble();
+            double longitude = location.get("longitude").asDouble();
+            return getWeatherByCoordinates(latitude, longitude);
+        } catch (Exception e) {
+            return getWeatherByCity("New York");
         }
     }
     
